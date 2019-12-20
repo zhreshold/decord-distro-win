@@ -64,8 +64,8 @@ install:
 
 # real work
 build:
-  - cd %APPVEYOR_BUILD_FOLDER%\decord\build
-  - cmake --build . --target decord --config Release
+  parallel: true
+  project: decord\build\decord.sln
 
 # scripts to run before build
 before_build:
