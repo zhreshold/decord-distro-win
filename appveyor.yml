@@ -1,0 +1,121 @@
+# Notes:
+#   - Minimal appveyor.yml file is an empty file. All sections are optional.
+#   - Indent each level of configuration with 2 spaces. Do not use tabs!
+#   - All section names are case-sensitive.
+#   - Section names should be unique on each level.
+
+#---------------------------------#
+#      general configuration      #
+#---------------------------------#
+
+# version format
+version: 1.0.{build}
+
+# branches to build
+branches:
+  only:
+    - master
+
+# Build worker image (VM template)
+image: Visual Studio 2015
+
+# environment variables
+environment:
+  PYTHON: Python35-x64
+  PYPI_PASSWORD:
+    secure: 3Q7RJFelNX5ptiCrQrnOKg==
+  PYPI_USERNAME:
+    secure: FQrgB9W+kITzpTxXsc1wNw==
+
+matrix:
+  fast_finish: true
+
+# scripts that are called at very beginning, before repo cloning
+init:
+  - git config --global core.autocrlf input
+  - ps: If ($env:APPVEYOR_REPO_TAG -eq "true" ) { write-output "From a tag build"; $GIT_TAG = (echo $env:APPVEYOR_REPO_TAG_NAME | %{$_ -replace "^patch-[^-]*-", ""});  $env:GIT_ADDITIONAL_FLAGS = "-b $GIT_TAG"; write-output $env:GIT_ADDITIONAL_FLAGS} Else { write-output "Not from a tag build"}
+  - ps: If ($env:APPVEYOR_SCHEDULED_BUILD -eq "True" ) { write-output "From a scheduled build" } Else { write-output "Not from a scheduled build"}
+  - set PYTHON_EXE=C:\%PYTHON%\python
+  - set PIP_EXE=C:\%PYTHON%\Scripts\pip
+  - set PYTHON_DIR=C:\%PYTHON%
+  - call %PYTHON_EXE% --version
+  - call %PIP_EXE% --version
+
+# cache:
+  # - C:\ProgramData\chocolatey\bin -> appveyor.yml
+  # - C:\ProgramData\chocolatey\lib -> appveyor.yml
+  # - C:\deps\opencv-install -> windows/make_opencv.cmd
+  # - C:\deps\openblas-install -> windows/make_openblas.cmd
+
+# scripts that run after cloning repository
+install:
+  - echo "install script"
+  - choco install -y pandoc cmake wget
+  - pandoc --version
+  - cmake --version
+  - wget --version
+  - call %PIP_EXE% install pypandoc nose wheel twine numpy
+  - SET NOSE_EXE=%PYTHON_DIR%\Scripts\nosetests
+  - SET TWINE_EXE=%PYTHON_DIR%\Scripts\twine
+  - dir %PYTHON_DIR%\Scripts\
+  - call %NOSE_EXE% --version
+  - call %TWINE_EXE% --version
+  - call .\pypirc.cmd
+
+# real work
+build:
+  - cd %APPVEYOR_BUILD_FOLDER%\decord\build
+  - cmake --build . --target decord --config Release
+
+# scripts to run before build
+before_build:
+  - echo "before build script"
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - git submodule update --recursive --init
+  - wget https://ffmpeg.zeranoe.com/builds/win64/dev/ffmpeg-4.2.1-win64-dev.zip
+  - ps: Expand-Archive -LiteralPath %APPVEYOR_BUILD_FOLDER%\ffmpeg-4.2.1-win64-dev.zip -DestinationPath %APPVEYOR_BUILD_FOLDER%\ffmpeg
+  - dir %APPVEYOR_BUILD_FOLDER%\ffmpeg
+  - SET DECORD_DIR=%APPVEYOR_BUILD_FOLDER%\decord\
+  - echo %DECORD_DIR%
+  - dir %DECORD_DIR%
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_CXX_FLAGS="/DDECORD_EXPORTS" -DCMAKE_CONFIGURATION_TYPES="Release" -G "Visual Studio 15 2017 Win64" -DFFMPEG_INCLUDE_DIR=%APPVEYOR_BUILD_FOLDER%\ffmpeg\include -DFFMPEG_LIBRARIES=%APPVEYOR_BUILD_FOLDER%\ffmpeg\lib ..
+
+# scripts to run after build
+after_build:
+
+# to run your custom scripts instead of automatic MSBuild
+build_script:
+
+# scripts to run before tests
+before_test:
+  - echo "before test script"
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - SET DECORD_DIR=%APPVEYOR_BUILD_FOLDER%\decord\
+  - echo %DECORD_DIR%
+  - dir %DECORD_DIR%
+  - wget https://raw.githubusercontent.com/zhreshold/decord-distro/master/setup.py
+  - xcopy /Y setup.py decord\setup.py
+  - cd .\decord
+  - FOR /F "delims=" %%i IN ('git rev-parse HEAD') DO echo %%i > COMMIT_HASH
+  - call %PYTHON_EXE% setup.py bdist_wheel
+  - cd %DECORD_DIR%
+  - FOR /F "tokens=* USEBACKQ" %%F IN (`dir /b /a-d dist\decord*`) DO (SET wheel_name=%%F)
+
+# to run your custom scripts instead of automatic tests
+test_script:
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - echo %wheel_name%
+  - 7z x "decord\dist\%wheel_name%" -odebug_wheel
+  - dir
+  - dir debug_wheel\
+  - call %PIP_EXE% install -U --force-reinstall "decord\dist\%wheel_name%"
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - call %PYTHON_EXE% -c "import decord; print(decord.__version__)"
+
+artifacts:
+  - path: decord\dist\*
+    name: pypiartifacts
+
+deploy_script:
