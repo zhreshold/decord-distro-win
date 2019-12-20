@@ -75,7 +75,8 @@ before_build:
   - cd %APPVEYOR_BUILD_FOLDER%
   - git submodule update --recursive --init
   - wget https://ffmpeg.zeranoe.com/builds/win64/dev/ffmpeg-4.2.1-win64-dev.zip
-  - ps: Expand-Archive -LiteralPath %APPVEYOR_BUILD_FOLDER%\ffmpeg-4.2.1-win64-dev.zip -DestinationPath %APPVEYOR_BUILD_FOLDER%\ffmpeg
+  - dir
+  - ps: Expand-Archive -LiteralPath $env:APPVEYOR_BUILD_FOLDER\ffmpeg-4.2.1-win64-dev.zip -DestinationPath $env:APPVEYOR_BUILD_FOLDER\ffmpeg
   - dir %APPVEYOR_BUILD_FOLDER%\ffmpeg
   - SET DECORD_DIR=%APPVEYOR_BUILD_FOLDER%\decord\
   - echo %DECORD_DIR%
