@@ -52,6 +52,7 @@ install:
   - echo "install script"
   - choco install -y pandoc wget
   - choco install -y cmake --installargs 'ADD_CMAKE_TO_PATH=System'
+  - refreshenv
   - pandoc --version
   - cmake --version
   - wget --version
