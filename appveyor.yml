@@ -50,7 +50,8 @@ init:
 # scripts that run after cloning repository
 install:
   - echo "install script"
-  - choco install -y pandoc cmake wget
+  - choco install -y pandoc wget
+  - choco install -y cmake --installargs 'ADD_CMAKE_TO_PATH=System'
   - pandoc --version
   - cmake --version
   - wget --version
