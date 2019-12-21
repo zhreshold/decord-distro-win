@@ -103,27 +103,29 @@ before_test:
   - echo %DECORD_DIR%
   - dir %DECORD_DIR%
   - wget https://raw.githubusercontent.com/zhreshold/decord-distro/master/setup.py
-  - xcopy /Y setup.py decord\*
+  - xcopy /Y setup.py decord\python\*
   - xcopy /Y %APPVEYOR_BUILD_FOLDER%\ffmpeg-4.2.1-win64-shared\bin\*.dll decord\python\decord\*
   - cd .\decord
   - FOR /F "delims=" %%i IN ('git rev-parse HEAD') DO echo %%i > COMMIT_HASH
+  - cd .\python
+  - dir .
   - call %PYTHON_EXE% setup.py bdist_wheel
-  - cd %DECORD_DIR%
+  - cd %DECORD_DIR%\python
   - FOR /F "tokens=* USEBACKQ" %%F IN (`dir /b /a-d dist\decord*`) DO (SET wheel_name=%%F)
 
 # to run your custom scripts instead of automatic tests
 test_script:
   - cd %APPVEYOR_BUILD_FOLDER%
   - echo %wheel_name%
-  - 7z x "decord\dist\%wheel_name%" -odebug_wheel
+  - 7z x "decord\python\dist\%wheel_name%" -odebug_wheel
   - dir
   - dir debug_wheel\
-  - call %PIP_EXE% install -U --force-reinstall "decord\dist\%wheel_name%"
+  - call %PIP_EXE% install -U --force-reinstall "decord\python\dist\%wheel_name%"
   - cd %APPVEYOR_BUILD_FOLDER%
   - call %PYTHON_EXE% -c "import decord; print(decord.__version__)"
 
 artifacts:
-  - path: decord\dist\*
+  - path: decord\python\dist\*
     name: pypiartifacts
 
 deploy_script:
