@@ -102,7 +102,6 @@ before_test:
   - SET DECORD_DIR=%APPVEYOR_BUILD_FOLDER%\decord\
   - echo %DECORD_DIR%
   - dir %DECORD_DIR%
-  - wget https://raw.githubusercontent.com/zhreshold/decord-distro/master/setup.py
   - xcopy /Y setup.py decord\python\*
   - xcopy /Y %APPVEYOR_BUILD_FOLDER%\ffmpeg-4.2.1-win64-shared\bin\*.dll decord\python\decord\*
   - cd .\decord
@@ -120,6 +119,7 @@ test_script:
   - 7z x "decord\python\dist\%wheel_name%" -odebug_wheel
   - dir
   - dir debug_wheel\
+  - dir debug_wheel\decord\
   - call %PIP_EXE% install -U --force-reinstall "decord\python\dist\%wheel_name%"
   - cd %APPVEYOR_BUILD_FOLDER%
   - call %PYTHON_EXE% -c "import decord; print(decord.__version__)"
