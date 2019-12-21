@@ -84,7 +84,7 @@ before_build:
   - cd %DECORD_DIR%
   - mkdir build
   - cd build
-  - cmake -DCMAKE_CXX_FLAGS="/DDECORD_EXPORTS" -DCMAKE_CONFIGURATION_TYPES="Release" -G "Visual Studio 15 2017 Win64" -DFFMPEG_INCLUDE_DIR=%APPVEYOR_BUILD_FOLDER%\ffmpeg-4.2.1-win64-dev\include -DFFMPEG_LIBRARIES=%APPVEYOR_BUILD_FOLDER%\ffmpeg-4.2.1-win64-dev\lib ..
+  - cmake -DCMAKE_CXX_FLAGS="/DDECORD_EXPORTS" -DCMAKE_CONFIGURATION_TYPES="Release" -G "Visual Studio 15 2017 Win64" -DFFMPEG_INCLUDE_DIR=%APPVEYOR_BUILD_FOLDER%\ffmpeg-4.2.1-win64-dev\include -DFFMPEG_LIBRARIES=%APPVEYOR_BUILD_FOLDER%\ffmpeg-4.2.1-win64-dev\lib\*.dll.a ..
 
 # scripts to run after build
 after_build:
