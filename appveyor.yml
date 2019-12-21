@@ -75,9 +75,12 @@ before_build:
   - cd %APPVEYOR_BUILD_FOLDER%
   - git submodule update --recursive --init
   - wget https://ffmpeg.zeranoe.com/builds/win64/dev/ffmpeg-4.2.1-win64-dev.zip
+  - wget https://ffmpeg.zeranoe.com/builds/win64/shared/ffmpeg-4.2.1-win64-shared.zip
   - dir
   - ps: Expand-Archive -LiteralPath $env:APPVEYOR_BUILD_FOLDER\ffmpeg-4.2.1-win64-dev.zip -DestinationPath $env:APPVEYOR_BUILD_FOLDER\
+  - ps: Expand-Archive -LiteralPath $env:APPVEYOR_BUILD_FOLDER\ffmpeg-4.2.1-win64-shared.zip -DestinationPath $env:APPVEYOR_BUILD_FOLDER\
   - dir %APPVEYOR_BUILD_FOLDER%\ffmpeg-4.2.1-win64-dev\
+  - dir %APPVEYOR_BUILD_FOLDER%\ffmpeg-4.2.1-win64-shared\
   - SET DECORD_DIR=%APPVEYOR_BUILD_FOLDER%\decord\
   - echo %DECORD_DIR%
   - dir %DECORD_DIR%
@@ -100,7 +103,8 @@ before_test:
   - echo %DECORD_DIR%
   - dir %DECORD_DIR%
   - wget https://raw.githubusercontent.com/zhreshold/decord-distro/master/setup.py
-  - xcopy /Y setup.py decord\setup.py
+  - xcopy /Y setup.py decord\*
+  - xcopy /Y %APPVEYOR_BUILD_FOLDER%\ffmpeg-4.2.1-win64-shared\bin\*.dll decord\python\decord\*
   - cd .\decord
   - FOR /F "delims=" %%i IN ('git rev-parse HEAD') DO echo %%i > COMMIT_HASH
   - call %PYTHON_EXE% setup.py bdist_wheel
