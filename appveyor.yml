@@ -49,6 +49,7 @@ init:
 
 # scripts that run after cloning repository
 install:
+  - "%VS140COMNTOOLS%\dumpbin"
   - echo "install script"
   - choco install -y pandoc wget
   - choco install -y cmake --installargs 'ADD_CMAKE_TO_PATH=System'
@@ -120,7 +121,7 @@ test_script:
   - dir
   - dir debug_wheel\
   - dir debug_wheel\decord\
-  - dumpbin /dependents debug_wheel\decord\decord.dll
+  - "%VS140COMNTOOLS%\dumpbin" /dependents debug_wheel\decord\decord.dll
   - call %PIP_EXE% install -U --force-reinstall "decord\python\dist\%wheel_name%"
   - cd %APPVEYOR_BUILD_FOLDER%
   - call %PYTHON_EXE% -c "import decord; print(decord.__version__)"
