@@ -40,7 +40,7 @@ init:
   - set PYTHON_DIR=C:\%PYTHON%
   - call %PYTHON_EXE% --version
   - call %PIP_EXE% --version
-  - set PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio 15.0\VC\bin
+  - cmd /k "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\tools\VsDevCmd.bat"
 
 # cache:
   # - C:\ProgramData\chocolatey\bin -> appveyor.yml
