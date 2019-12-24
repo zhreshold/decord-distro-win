@@ -52,10 +52,12 @@ install:
   - echo "install script"
   - choco install -y pandoc wget
   - choco install -y cmake --installargs 'ADD_CMAKE_TO_PATH=System'
+  - choco install -y dependencywalker
   - refreshenv
   - pandoc --version
   - cmake --version
   - wget --version
+  - C:\ProgramData\chocolatey\lib\dependencywalker\content\depends.exe -h
   - call %PIP_EXE% install pypandoc nose wheel twine numpy
   - SET NOSE_EXE=%PYTHON_DIR%\Scripts\nosetests
   - SET TWINE_EXE=%PYTHON_DIR%\Scripts\twine
@@ -120,6 +122,7 @@ test_script:
   - dir
   - dir debug_wheel\
   - dir debug_wheel\decord\
+  - C:\ProgramData\chocolatey\lib\dependencywalker\content\depends.exe -chain debug_wheel\decord\decord.dll
   - call %PIP_EXE% install -U --force-reinstall "decord\python\dist\%wheel_name%"
   - cd %APPVEYOR_BUILD_FOLDER%
   - call %PYTHON_EXE% -c "import decord; print(decord.__version__)"
