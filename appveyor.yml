@@ -104,6 +104,8 @@ before_test:
   - dir %DECORD_DIR%
   - xcopy /Y setup.py decord\python\*
   - xcopy /Y %APPVEYOR_BUILD_FOLDER%\ffmpeg-4.2.1-win64-shared\bin\*.dll decord\python\decord\*
+  - copy %WINDIR%\system32\MSVCP140.dll decord\python\decord\
+  - copy %WINDIR%\system32\VCRUNTIME140.dll decord\python\decord\
   - cd .\decord
   - FOR /F "delims=" %%i IN ('git rev-parse HEAD') DO echo %%i > COMMIT_HASH
   - cd .\python
@@ -122,7 +124,7 @@ test_script:
   - dir debug_wheel\decord\
   - call %PIP_EXE% install -U --force-reinstall "decord\python\dist\%wheel_name%"
   - cd %APPVEYOR_BUILD_FOLDER%
-  #- call %PYTHON_EXE% -c "import decord; print(decord.__version__)"
+  - call %PYTHON_EXE% -c "import decord; print(decord.__version__)"
 
 artifacts:
   - path: decord\python\dist\*
