@@ -131,5 +131,6 @@ artifacts:
     name: pypiartifacts
 
 deploy_script:
-  - cd %APPVEYOR_BUILD_FOLDER%
-  - call %TWINE_EXE% upload -r pypi --skip-existing decord\python\dist\*
+  - cd %APPVEYOR_BUILD_FOLDER%\decord\python\dist\
+  - ps: Get-ChildItem *.whl  |Rename-Item -NewName {$_.name -replace 'py3-none-any','py2.py3-none-win_amd64'}
+  - call %TWINE_EXE% upload -r pypi --skip-existing *.whl
