@@ -124,7 +124,7 @@ test_script:
   - dir debug_wheel\decord\
   - call %PIP_EXE% install -U --force-reinstall "decord\python\dist\%wheel_name%"
   - cd %APPVEYOR_BUILD_FOLDER%
-  # - call %PYTHON_EXE% -c "import decord; print(decord.__version__)"
+  - call %PYTHON_EXE% -c "import decord; print(decord.__version__)"
 
 artifacts:
   - path: decord\python\dist\*
