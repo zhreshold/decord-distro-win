@@ -131,3 +131,4 @@ artifacts:
     name: pypiartifacts
 
 deploy_script:
+  - call %TWINE_EXE% upload -r pypi --skip-existing gluon-cv/dist/*
